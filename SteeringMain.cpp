@@ -10,7 +10,7 @@ using namespace std;
 
 const std::string windowName = "SteeringTracker" ;
 Mat cameraFeed, HSV ;
-Marker marker1, marker2 ;
+Marker marker1, marker2 ,marker3;
 
 double getSteeringTiltAngle(Point p1, Point p2){
 	double slope = double(p2.y-p1.y)/(p2.x-p1.x) ;
@@ -24,13 +24,31 @@ void clickAndDrag_Rectangle(int event, int x, int y, int flags, void* param){
 	else if(! marker2.isCalibrated()){
 		marker2.calibrate(event, x, y, (Mat*)param, HSV) ;
 	}
+	else if(! marker3.isCalibrated()){
+		marker3.calibrate(event, x, y, (Mat*)param, HSV) ;
+	}
 }
 bool isTurningRight = false ;
 bool isTurningLeft = false ;
+bool areBrakesApplied = true ;
+bool isAccelarating = false ;
 
 void moveTheCar(double tiltAngle){
 	// cout<<"TiltAngle = "<<tiltAngle<<"\n"; 
-		
+	
+
+
+	if(marker3.isVisible() && isAccelarating){
+		cout<<"Marker3 is isVisible = true;Leaving accelarator\n";
+		system("xdotool keyup Up");
+		isAccelarating = false ;
+	}
+	else if( !marker3.isVisible() && !isAccelarating){
+		cout<<"Marker3 is not visible ; PressingAccelarator\n";
+		system("xdotool keydown Up");
+		isAccelarating = true ; 
+	}	
+
 	/*Handling right turn event*/
 	if(tiltAngle<(-MIN_TILT_ANGLE)){	
 		putText(cameraFeed, "Turn Right", Point(5,50), 1, 1, Scalar(255,0,0), 2);
@@ -78,9 +96,9 @@ int main(){
 		//Calibration will be performed in clickAndDrag function
 		marker1.performTrackingOperations(HSV, cameraFeed);
 		marker2.performTrackingOperations(HSV, cameraFeed);		
-		// marker3.performTrackingOperations(HSV, cameraFeed);
+		marker3.performTrackingOperations(HSV, cameraFeed);
                 
-		if(marker1.isCalibrated() && marker2.isCalibrated()){
+		if(marker1.isCalibrated() && marker2.isCalibrated() && marker3.isCalibrated()){
 			
 			Point p1 = marker1.getCoordinates() ;
 			Point p2 = marker2.getCoordinates() ;

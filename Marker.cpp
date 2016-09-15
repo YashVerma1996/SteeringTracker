@@ -85,9 +85,11 @@ void Marker::trackFilteredObject(Mat &threshold, Mat &cameraFeed){
 			}
 			if(objectFound ==true)
 				drawObject(cameraFeed);}
-			else 
-				putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
+			else{ 
+				  // putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
+			}
 	}
+	objectVisible = objectFound ;
 }
 
 void Marker::drawObject(Mat &frame){
@@ -169,4 +171,8 @@ void Marker::performTrackingOperations(Mat &HSV, Mat &cameraFeed){
 
 Point Marker::getCoordinates(){
 	return Point(x, y) ;
+}
+
+bool Marker::isVisible(){
+	return objectVisible == true; 	
 }

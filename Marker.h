@@ -16,7 +16,8 @@ class Marker{
 
 	bool useMorphs ;
 	bool trackObject ;
-	
+	bool objectVisible ;
+
 	Point initialClickPoint, currentMousePoint ;
 	Rect rectangleROI ;
 
@@ -36,4 +37,5 @@ class Marker{
   	void calibrate(int event, int x, int y, Mat* frame, Mat &hsv_frame);
   	void performTrackingOperations(Mat &HSV, Mat &cameraFeed);
 	Point getCoordinates();
+	bool isVisible();
 };
