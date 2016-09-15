@@ -10,7 +10,7 @@ using namespace std;
 
 const std::string windowName = "SteeringTracker" ;
 Mat cameraFeed, HSV ;
-Marker marker1, marker2 ,marker3;
+Marker marker1, marker2 ,marker3, marker4;
 
 double getSteeringTiltAngle(Point p1, Point p2){
 	double slope = double(p2.y-p1.y)/(p2.x-p1.x) ;
@@ -27,6 +27,9 @@ void clickAndDrag_Rectangle(int event, int x, int y, int flags, void* param){
 	else if(! marker3.isCalibrated()){
 		marker3.calibrate(event, x, y, (Mat*)param, HSV) ;
 	}
+	else if(! marker4.isCalibrated()){
+		marker4.calibrate(event, x, y, (Mat*)param, HSV) ;
+	}
 }
 bool isTurningRight = false ;
 bool isTurningLeft = false ;
@@ -36,17 +39,28 @@ bool isAccelarating = false ;
 void moveTheCar(double tiltAngle){
 	// cout<<"TiltAngle = "<<tiltAngle<<"\n"; 
 	
-
-
+	/*Handling Up Arrow Key*/
 	if(marker3.isVisible() && isAccelarating){
-		cout<<"Marker3 is isVisible = true;Leaving accelarator\n";
+		cout<<"AcceleratorMarker is isVisible = true;Leaving accelerator\n";
 		system("xdotool keyup Up");
 		isAccelarating = false ;
 	}
 	else if( !marker3.isVisible() && !isAccelarating){
-		cout<<"Marker3 is not visible ; PressingAccelarator\n";
+		cout<<"AcceleratorMarker is not visible ; PressingAccelerator\n";
 		system("xdotool keydown Up");
 		isAccelarating = true ; 
+	}
+	
+	/*Handling Down Arrow Key*/
+	if(marker4.isVisible() && areBrakesApplied){
+		cout<<"BrakeMarker is isVisible = true;Leaving brakes\n";
+		system("xdotool keyup Down");
+		areBrakesApplied = false ;
+	}
+	else if( !marker4.isVisible() && !areBrakesApplied){
+		cout<<"BrakeMarker is not visible ; Applying Brakes\n";
+		system("xdotool keydown Down");
+		areBrakesApplied = true ; 
 	}	
 
 	/*Handling right turn event*/
@@ -97,8 +111,9 @@ int main(){
 		marker1.performTrackingOperations(HSV, cameraFeed);
 		marker2.performTrackingOperations(HSV, cameraFeed);		
 		marker3.performTrackingOperations(HSV, cameraFeed);
+		marker4.performTrackingOperations(HSV, cameraFeed);
                 
-		if(marker1.isCalibrated() && marker2.isCalibrated() && marker3.isCalibrated()){
+		if(marker1.isCalibrated() && marker2.isCalibrated() && marker3.isCalibrated() && marker4.isCalibrated()){
 			
 			Point p1 = marker1.getCoordinates() ;
 			Point p2 = marker2.getCoordinates() ;
@@ -116,7 +131,9 @@ int main(){
 				return 0 ;
 			case 'c' : 
 					marker1.setCalibrationMode(true);
-					marker1.setCalibrationMode(true);
+					marker2.setCalibrationMode(true);
+					marker3.setCalibrationMode(true);
+					marker4.setCalibrationMode(true);
 					cout<<"Please calibrate the markers." ; 
 				break; 	
 		}
