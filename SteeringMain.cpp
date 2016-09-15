@@ -25,7 +25,41 @@ void clickAndDrag_Rectangle(int event, int x, int y, int flags, void* param){
 		marker2.calibrate(event, x, y, (Mat*)param, HSV) ;
 	}
 }
+bool isTurningRight = false ;
+bool isTurningLeft = false ;
 
+void moveTheCar(double tiltAngle){
+	// cout<<"TiltAngle = "<<tiltAngle<<"\n"; 
+		
+	/*Handling right turn event*/
+	if(tiltAngle<(-MIN_TILT_ANGLE)){	
+		putText(cameraFeed, "Turn Right", Point(5,50), 1, 1, Scalar(255,0,0), 2);
+		
+		if(!isTurningRight){		
+			//Either it is moving straight or turning left, so stop it from turning left and start turning right.
+			system("xdotool keyup Left keydown Right");		
+			isTurningLeft = false ;
+			isTurningRight = true ;
+		}
+	}
+	else if(tiltAngle>MIN_TILT_ANGLE){
+		putText(cameraFeed, "Turn Left", Point(5,50), 1, 1, Scalar(255,0,0), 2);
+		if(!isTurningLeft){		
+			//Either it is moving straight or turning right, so stop it from turning right and start turning left. 
+			system("xdotool keyup Right keydown Left");		
+			isTurningLeft = true ;
+			isTurningRight = false ;
+		}
+	}
+	else{
+		putText(cameraFeed, "Straight", Point(5,50), 1, 1, Scalar(255,0,0), 2);
+		if(isTurningLeft || isTurningRight){
+			system("xdotool keyup Left keyup Right");
+			isTurningLeft = false ;
+			isTurningRight = false ;		
+		}
+	}
+}
 int main(){
 	
 	VideoCapture capture(0) ;
@@ -44,8 +78,8 @@ int main(){
 		//Calibration will be performed in clickAndDrag function
 		marker1.performTrackingOperations(HSV, cameraFeed);
 		marker2.performTrackingOperations(HSV, cameraFeed);		
-
-
+		// marker3.performTrackingOperations(HSV, cameraFeed);
+                
 		if(marker1.isCalibrated() && marker2.isCalibrated()){
 			
 			Point p1 = marker1.getCoordinates() ;
@@ -54,15 +88,7 @@ int main(){
 			line(cameraFeed,p1,p2,Scalar(255,0,0),2);
 			
 			tiltAngle = getSteeringTiltAngle(p1, p2) ;
-			cout<<"TiltAngle = "<<tiltAngle<<"\n"; 
-			if(tiltAngle<(-20.0)){	
-				putText(cameraFeed, "Turn Right", Point(5,50), 1, 1, Scalar(255,0,0), 2);
-				// system("xdotool type 'right\n'");
-			}
-			else if(tiltAngle>20.0){
-				putText(cameraFeed, "Turn Left", Point(5,50), 1, 1, Scalar(255,0,0), 2);
-				// system("xdotool type 'left\n'");
-			}
+			moveTheCar(tiltAngle) ;
 		}
 			
 		imshow(windowName, cameraFeed);	
