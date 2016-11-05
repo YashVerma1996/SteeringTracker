@@ -93,16 +93,19 @@ void moveTheCar(double tiltAngle){
 	}
 }
 
-void mirrorCameraFeed(){		//To calibrate markers easily
+void mirrorCameraFeed(){
 	int cols = FRAME_WIDTH ;
 	int rows = FRAME_HEIGHT ;
+	//cout<<"FRAME_HEIGHT = "<<FRAME_HEIGHT<<" FRAME_WIFTH = "<<FRAME_WIDTH<<"\n" ;
 	Vec3b temp ;
 	for(int i=0 ; i<FRAME_HEIGHT ; i++)
 		for(int j=0 ; j<=FRAME_WIDTH/2 ; j++){
+			//cout<<"loop\n";
 			temp = cameraFeed.at<Vec3b>(i,j) ;
 			cameraFeed.at<Vec3b>(i,j) = cameraFeed.at<Vec3b>(i,FRAME_WIDTH-j) ;
 			cameraFeed.at<Vec3b>(i,FRAME_WIDTH-j) = temp ;
-		}			
+		}
+			
 }
 
 int main(){
