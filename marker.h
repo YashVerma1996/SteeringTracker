@@ -1,8 +1,9 @@
+#ifndef MARKER_H__
+#define MARKER_H__
 #include <opencv2/opencv.hpp>
 using namespace cv ;
 
 class Marker{
-	
 	int x ;
 	int y ;
 
@@ -38,4 +39,8 @@ class Marker{
   	void performTrackingOperations(Mat &HSV, Mat &cameraFeed);
 	Point getCoordinates();
 	bool isVisible();
+
+	Mat getThreshold();
 };
+
+#endif
